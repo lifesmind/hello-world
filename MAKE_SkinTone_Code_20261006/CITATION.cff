@@ -1,0 +1,12 @@
+cff-version: 1.2.0
+message: "If you use this code, please cite the accompanying article."
+title: "Targeted Skin-Tone Annotation for Skin Lesion Classification: Annotation Efficiency, Stronger Baselines and Diagnosis Matching with Frozen MedSigLIP Features — source code"
+authors:
+  - family-names: Tangprasert
+    given-names: Sakchai
+    orcid: "https://orcid.org/0009-0000-3517-4543"
+  - family-names: Chanthasen
+    given-names: Suwit
+    orcid: "https://orcid.org/0009-0001-3927-5306"
+license: MIT
+date-released: 2026-10-07

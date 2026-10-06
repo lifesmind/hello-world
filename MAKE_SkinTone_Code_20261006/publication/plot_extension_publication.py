@@ -10,8 +10,8 @@ import pandas as pd
 
 LABELS = {
     'PAD_baseline': 'PAD-only transfer',
-    'target_weighted': 'V-VI addition, weighted',
-    'target_unweighted': 'V-VI addition, unweighted',
+    'target_weighted': 'V–VI addition, weighted',
+    'target_unweighted': 'V–VI addition, unweighted',
     'lighter_weighted': 'Outcome-matched lighter, weighted',
     'all_DDI_unweighted': 'All-DDI addition, unweighted',
     'all_DDI_source_weighted': 'All-DDI addition, weighted',
@@ -43,7 +43,7 @@ def main(root):
         records.append({'figure':name, 'source':source,
                         'source_sha256':hashlib.sha256((root/source).read_bytes()).hexdigest(),
                         'filters':filters, 'title':title,
-                        'change':'Removed experiment-prefix text only; original estimates, intervals, axes and colors retained.'})
+                        'change':'Removed experiment-prefix text; corrected Figure 5 axis label (per-arm, not paired, intervals); en dashes in tone ranges. Estimates, intervals, axes limits and colors unchanged.'})
     arms = list(LABELS)
     fig, ax = plt.subplots(figsize=(7.5,4.8))
     for i, arm in enumerate(arms):
@@ -55,15 +55,15 @@ def main(root):
     ax.invert_yaxis()
     ax.axvline(.5, ls='--', lw=.8, color='#BBBBBB')
     ax.set_xlim(.36,.94)
-    ax.set_xlabel('V-VI AUROC with exploratory paired 95% CI')
+    ax.set_xlabel('V–VI AUROC with exploratory 95% CI')
     ax.grid(axis='x',alpha=.17)
     title = 'Domain adaptation and bias baselines'
     ax.set_title(title,loc='left',fontweight='bold',pad=12)
     save(fig,'Figure5_baselines','tables/Table_E1_baselines.csv',{'cohort':'V-VI','arms':arms},title)
     fig, ax = plt.subplots(figsize=(7.2,2.8))
     pairs = [('target_weighted','lighter_weighted'),('diagnosis_matched_target','diagnosis_matched_lighter')]
-    labels = ['Outcome-matched controls\n165-166 images/source/fold',
-              'Exact diagnosis-overlap controls\n114-125 images/source/fold']
+    labels = ['Outcome-matched controls\n165–166 images/source/fold',
+              'Exact diagnosis-overlap controls\n114–125 images/source/fold']
     for i,(left,right) in enumerate(pairs):
         r = cv[(cv.left_arm==left)&(cv.right_arm==right)].iloc[0]
         ax.errorbar(r.difference_unrounded,i,
@@ -73,7 +73,7 @@ def main(root):
     ax.set_yticks([0,1],labels)
     ax.invert_yaxis()
     ax.set_xlim(-.04,.34)
-    ax.set_xlabel('V-VI AUROC difference: target minus lighter [95% CI]')
+    ax.set_xlabel('V–VI AUROC difference: target minus lighter (95% CI)')
     ax.grid(axis='x',alpha=.15)
     title = 'Disease-mix sensitivity'
     ax.set_title(title,loc='left',fontweight='bold')

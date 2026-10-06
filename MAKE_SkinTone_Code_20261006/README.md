@@ -2,7 +2,7 @@
 
 **Targeted Skin-Tone Annotation for Skin Lesion Classification: Annotation Efficiency, Stronger Baselines and Diagnosis Matching with Frozen MedSigLIP Features**
 
-Sakchai Tangprasert and Suwit Chanthasen. Source release: 6 October 2026.
+Sakchai Tangprasert and Suwit Chanthasen. Source release: 6 October 2026; publication-code update: 7 October 2026.
 
 This directory contains the original PAD/DDI reanalysis, the separately recorded exploratory E1–E3 extension, the prepared E4 evaluator, and publication plotting/verification recipes. **E4 has not been executed on real MRA-MIDAS data.** An input-validation test is not an external performance result.
 
@@ -73,3 +73,7 @@ The evaluator uses the seven previously saved heads without MRA model selection 
 - Extension protocol: `58a6164a2b2fb03941887679e6cf21ebb1271d5b5522ea1c4ac04e05456f86b9`
 
 Questions about authorized numerical inputs or source-code reuse: sakchai.t@sci.kmutnb.ac.th.
+
+## Publication update: 7 October 2026
+
+The author-supplied MIT LICENSE and CITATION.cff accompany this update. Figures 5 and 7 have no in-image experiment prefixes, and Figure 5 correctly labels per-arm intervals. The supplied figure exports record Matplotlib 3.11.2; use publication/requirements-figures-20261007.txt for this renderer. Older original result plots retain their recorded 3.10.8 environment. Font and backend changes can alter file bytes without changing estimates. Annotation budgets count training labels under known released outcomes/diagnoses, and do not establish prospective screening or annotation-cost savings.
