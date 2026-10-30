@@ -1,0 +1,8 @@
+model_id,AUROC,CI95_low,CI95_high
+E4_PAD_baseline,0.7081,0.6721,0.7425
+E4_target_weighted_full,0.6556,0.6171,0.6934
+E4_all_DDI_source_weighted_full,0.7139,0.6778,0.7487
+E4_all_DDI_group_reweighted_full,0.7102,0.6737,0.7453
+E4_DDI_only_class_balanced_full,0.7141,0.6775,0.7485
+E4_DDI_only_group_balanced_full,0.7089,0.6723,0.7436
+DFR_ensemble_f-1,0.7379,0.7016,0.7719
