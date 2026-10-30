@@ -1,27 +1,90 @@
-# Real E4 input requirements
+# E4 MRA-MIDAS publication inputs
 
-Status: not executed. These are field definitions, not completed author attestations.
+Status: completed for the manuscript E4 analysis.
 
-## Reviewed image CSV
+This file documents the inputs consumed by the final public evaluator. It does not redistribute MRA-MIDAS photographs, the 1,152-dimensional feature matrix, row-level clinical metadata or per-image predictions.
 
-`analysis_image_id,image_relative_path,patient_key,lesion_key,diagnosis_code,target_label,skin_tone_group,modality,biopsy_confirmed,eligible`
+## Final feature matrix
 
-- One row per actual clinical image. Preserve nonempty patient and lesion identifiers from the release.
-- `image_relative_path` is relative to the actual local image directory.
-- `target_label`: 0 or 1 for included images, following a reviewed diagnosis mapping.
-- `skin_tone_group`: I-II, III-IV, V-VI or UNKNOWN; do not invent missing Fitzpatrick labels.
-- `modality`: clinical for all eligible rows. Dermoscopic views are excluded.
-- `biopsy_confirmed` and `eligible`: reviewed 0/1 fields. All included rows require a biopsy-confirmed endpoint.
-- Intermediate and uncertain diagnoses must be excluded. The extractor does not decide eligibility or alter labels.
+File used in the publication analysis:
 
-The extractor adds actual image SHA256, sequential zero-based feature rows and the SHA256 of each contiguous float32 feature row. It emits `MRA_features_l2.npy`, `MRA_feature_manifest.csv` and `MRA_feature_spec.json` from real inputs only.
+- `MRA_MIDAS_E4_features_l2.npy`
+- dtype: float32
+- shape: `(1579, 1152)`
+- every row finite and L2-normalised
+- encoder: `google/medsiglip-448`
+- pinned revision: `9cea28a1a1195f665105faa6e8544c112fd960a4`
+- image size: 448 × 448
+- pooled image feature: `get_image_features(..., return_dict=True).pooler_output`
+- final operation: float32 L2 normalisation
 
-## Label audit JSON
+The public local-image adapter is `publication/MAKE_Extract_MRA_Features.py`.
 
-The evaluator requires `dataset_doi` = `10.71718/15nz-jv40`, nonempty `reviewed_by` and `reviewed_utc`, and true reviewed fields `histopathology_binary_endpoint_reviewed`, `intermediate_and_uncertain_excluded` and `clinical_only_reviewed`. `diagnosis_to_binary` maps the actual diagnosis codes to 0, 1 or `EXCLUDE`. Review against source documentation and the intended clinical endpoint before setting these flags.
+## Final manifest
 
-## Data-use review JSON
+The publication evaluator requires one row per feature row. Minimum required columns are:
 
-Both extractor and evaluator require actual author review: `noncommercial_research_use_reviewed`, `processing_environment_reviewed`, `agreement_version_or_date`, `reviewed_by`. Do not treat blank templates, automatically filled flags or the public dataset webpage as evidence of acceptance of an agreement.
+`midas_record_id,label`
 
-The release intentionally does not provide affirmative placeholder audit JSON files. Without real images/features and reviewed source metadata there are no E4 scientific results to add to the paper.
+Optional but recommended traceability columns are:
+
+`feature_row_index,midas_file_name,local_file_name,endpoint_group`
+
+If `feature_row_index` is present, it must be a zero-based sequence matching the feature matrix.
+
+The binary label is 1 for the positive endpoint and 0 for the negative endpoint.
+
+## Cohort definition
+
+MRA-MIDAS v1.0 clinical-image rows were filtered as follows:
+
+- released control flag must be `no`;
+- released distance must be 6-inch or 1-foot;
+- malignant basal cell carcinoma, squamous cell carcinoma and melanoma are positive;
+- diagnoses beginning with `benign-` are negative;
+- intermediate or otherwise non-mapped diagnoses are excluded.
+
+Audit counts for the publication E4 cohort:
+
+- clinical-image rows considered: 1,935
+- endpoint-review exclusions: 349
+- endpoint-defined rows before image-file matching: 1,586
+- endpoint-defined rows without a matching image file: 7
+- final images: 1,579
+- positive images: 692
+- negative images: 887
+- unique `midas_record_id` groups: 567
+- mixed-label record groups: 67
+
+The released `midas_record_id` is not asserted to be a patient identifier. Mixed-label groups are therefore allowed and are resampled as intact statistical clusters.
+
+## Frozen deployment heads
+
+Required files:
+
+- `models/E4_deployment_models.npz`
+- `models/E4_deployment_registry.csv`
+
+The NPZ contains seven frozen coefficient vectors of length 1,152 and seven intercepts. All seven heads were fitted and saved before MRA-MIDAS scoring. No E4 head is refitted, recalibrated or selected on MRA-MIDAS.
+
+## Final estimand and uncertainty
+
+- point estimate: image-level AUROC;
+- bootstrap unit: `midas_record_id`;
+- bootstrap replicates: 10,000;
+- random seed: 0;
+- interval: 2.5th and 97.5th percentiles of valid record-cluster bootstrap AUROCs.
+
+These intervals are record-clustered and must not be described as patient-level confidence intervals.
+
+## Final aggregate results
+
+The seven-head aggregate output is public in:
+
+`publication/E4_MRA_MIDAS_7heads_AUROC.csv`
+
+The DFR ensemble had the highest observed AUROC, 0.7379 (95% record-clustered CI 0.7016–0.7719). This is an observed external ranking, not a basis for retrospective model selection.
+
+## Source-use restrictions
+
+Dataset access and redistribution remain governed by the MRA-MIDAS custodian. This repository intentionally excludes raw clinical photographs, restricted metadata, feature arrays and individual predictions.
